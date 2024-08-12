@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uploaded Files</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            backgrund-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: url(bg.png);
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        .container {
+            background-color: #ddd;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 10%;
+            max-width: 300px;
+            position: relative;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        #searchBar {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            background :#ccc;
+        }
+
+        button {
+            width: 100%;
+            padding: 20px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #fileList {
+            max-height: 400px;
+            overflow-y: auto;
+            padding-left: 0;
+            margin-top: 10px;
+        }
+
+        #fileList li {
+            list-style: none;
+            padding: 10px;
+            border: 1px solid #ddd;
+            margin-top: 10px;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            display: flex;
+            align-items: center;
+            box-sizing: border-box;
+            transition: background-color 0.3s ease;
+            position: relative;
+        }
+
+        #fileList li:hover {
+            background-color: #f1f1f1;
+        }
+
+        #fileList li .file-icon {
+            width: 30px;
+            height: 30px;
+            margin-right: 10px;
+            color: #333;
+            font-size: 1.4rem;
+        }
+
+        #fileList li .file-name {
+            flex-grow: 1;
+            color: #000;
+            margin-right: 10px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: calc(100% - 150px); /* Adjust based on space needed for size and button */
+        }
+
+        #fileList li .file-size {
+            margin-right: 10px;
+            font-size: 12px;
+            color: #555;
+            white-space: nowrap;
+        }
+
+        #fileList li .download-btn {
+            width: 100px;
+            height: 30px;
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s ease;
+            margin-left: auto; /* Align button to the right */
+            position: absolute;
+            right: 10px; /* Adjust this value to position the button as needed */
+        }
+
+        #fileList li .download-btn:hover {
+            background-color: #218838;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+                width: 100%;
+            }
+
+            #searchBar {
+                width: calc(100% - 18px);
+            }
+
+            #fileList li .file-name {
+                max-width: calc(100% - 120px);
+            }
+
+            #fileList li .download-btn {
+                width: 80px;
+                height: 25px;
+            }
+        }
+
+        /* Loading Spinner */
+        #loadingSpinner {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        
+        .delete{
+        text-decoration :none;
+        padding:10px;
+        background :tomato;
+        border:0.8px solid #ddd;
+        margin:20px;
+        color :white;
+        border-radius :10px;
+        
+        
+        }
+        
+        
+        
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2> Delete Files</h2>
+        <input type="text" id="searchBar" placeholder="Search files...">
+        <ul id="fileList"></ul>
+        <p>অপ্রয়োজনীয় ফাইল ডিলিট করো</p>
+        <div id="loadingSpinner">
+            <i class="fas fa-delete fa-delete fa-3x"></i>
+        </div>
+        
+        
+        <div><a class="delete" href="admin.html">Upload file</a>
+        <a class="delete" href="index.html">Go Home</a></div>
+        
+    </div>
+    
+    
+    
+    
+    
+    
+
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-storage.js"></script>
+    <script>
+        // Firebase configuration
+        var firebaseConfig = {
+            apiKey: "AIzaSyDKOz-sBiEJmre0eyIr2qnVGoEcZFyLTaY",
+            authDomain: "photography-4ded6.firebaseapp.com",
+            databaseURL: "https://photography-4ded6-default-rtdb.firebaseio.com",
+            projectId: "photography-4ded6",
+            storageBucket: "photography-4ded6.appspot.com",
+            messagingSenderId: "18693535056",
+            appId: "1:18693535056:web:66ac3aea0cae7826a5a855",
+            measurementId: "G-GTNV78717R"
+        };
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+
+        function loadFiles() {
+            const fileList = document.getElementById("fileList");
+            fileList.innerHTML = "";
+            document.getElementById("loadingSpinner").style.display = 'block';
+
+            firebase.database().ref('files').on('value', (snapshot) => {
+                document.getElementById("loadingSpinner").style.display = 'none';
+                snapshot.forEach((childSnapshot) => {
+                    const file = childSnapshot.val();
+                    const li = document.createElement('li');
+
+                    // File icon
+                    const icon = document.createElement('i');
+                    icon.classList.add('fas');
+                    icon.classList.add(getFileIcon(file.name));
+                    icon.classList.add('file-icon');
+                    li.appendChild(icon);
+
+                    // File name
+                    const name = document.createElement('span');
+                    name.className = "file-name";
+                    name.textContent = file.name;
+                    li.appendChild(name);
+
+                    // Fetch file size from Firebase Storage
+                    firebase.storage().refFromURL(file.url).getMetadata().then((metadata) => {
+                        const size = document.createElement('span');
+                        size.className = "file-size";
+                        size.textContent = formatFileSize(metadata.size);
+                        li.appendChild(size);
+                    }).catch((error) => {
+                        console.error("Error fetching file size:", error);
+                        const size = document.createElement('span');
+                        size.className = "file-size";
+                        size.textContent = "Unknown size";
+                        li.appendChild(size);
+                    });
+
+                    // Download button
+                    const downloadBtn = document.createElement('button');
+                    downloadBtn.className = "download-btn";
+                    downloadBtn.innerHTML = '<i class="fas fa-delete"></i> Delete';
+                    downloadBtn.addEventListener('click', () => downloadFile(file));
+                    li.appendChild(downloadBtn);
+
+                    fileList.appendChild(li);
+                });
+            });
+        }
+
+        function getFileIcon(fileName) {
+            const ext = fileName.split('.').pop().toLowerCase();
+            switch (ext) {
+                case 'pdf': return 'fa-file-pdf';
+                case 'jpg':
+                case 'jpeg':
+                case 'png': return 'fa-file-image';
+                case 'zip':
+                case 'rar': return 'fa-file-archive';
+                case 'doc':
+                case 'docx': return 'fa-file-word';
+                case 'xls':
+                case 'xlsx': return 'fa-file-excel';
+                default: return 'fa-file';
+            }
+        }
+
+        function formatFileSize(bytes) {
+            const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+            if (bytes === 0) return '0 Byte';
+            const i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
+            return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[i];
+        }
+
+        function downloadFile(file) {
+            const storageRef = firebase.storage().refFromURL(file.url);
+            const fileName = file.name;
+
+            // Create an invisible link element for downloading
+            const link = document.createElement('a');
+            link.href = file.url;
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            // Delete the file from Firebase Storage
+            storageRef.delete().then(() => {
+            console.log("File deleted from storage");
+            
+            // Remove file metadata from Firebase Realtime Database
+            firebase.database().ref('files').orderByChild('name').equalTo(fileName).once('value').then(snapshot => {
+            snapshot.forEach(childSnapshot => {
+            childSnapshot.ref.remove().then(() => {
+            console.log("File metadata deleted from database");
+            loadFiles(); // Reload the files list after deletion
+            }).catch(error => {
+            console.error("Error deleting file metadata:", error);
+            });
+            });
+            }).catch(error => {
+            console.error("Error fetching file metadata:", error);
+            });
+            }).catch((error) => {
+            console.error("Error deleting file from storage:", error);
+            });
+            }
+            
+            document.getElementById("searchBar").addEventListener("input", function () {
+            const filter = this.value.toLowerCase();
+            const files = document.querySelectorAll('#fileList li');
+            files.forEach(file => {
+            const fileName = file.querySelector('.file-name').textContent.toLowerCase();
+            if (fileName.includes(filter)) {
+            file.style.display = '';
+            } else {
+            file.style.display = 'none';
+            }
+            });
+            });
+            
+            document.addEventListener("DOMContentLoaded", loadFiles);
+            </script>
+            </body>
+            </html>

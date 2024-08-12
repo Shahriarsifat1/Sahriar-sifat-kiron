@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mosaic Gallery</title>
+    <style>
+        /* Internal CSS */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1b1f24;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+        .container {
+            width: 90%;
+            margin: auto;
+            padding: 10px;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+            position: relative;
+        }
+        .gallery-item {
+            position: relative;
+            overflow: hidden;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.3s ease-in-out;
+            width: 100%;
+            height: 140px; /* Fixed height */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Cover the element's box */
+            transition: transform 0.3s ease-in-out;
+        }
+        .gallery-item:hover img {
+            transform: scale(1.1);
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            animation: fadeIn 0.5s;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .modal-content {
+            position: relative;
+            max-width: 90%;
+            max-height: 80%;
+        }
+        .modal-content img {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+            animation: zoomIn 0.3s ease;
+        }
+        @keyframes zoomIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .modal-close {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            font-size: 30px;
+            color: white;
+            cursor: pointer;
+        }
+        .modal-caption {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            color: white;
+            text-align: center;
+            font-size: 18px;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 10px;
+            border-radius: 5px;
+        }
+        @media (max-width: 768px) {
+            .gallery {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+        }
+        @media (max-width: 576px) {
+            .gallery {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Mosaic Gallery</h1>
+
+        <!-- Gallery Section -->
+        <div class="gallery">
+            <div class="gallery-item" onclick="openModal('images/1.jpg', 'Image 1')">
+                <img src="images/1.jpg" alt="Image 1">
+            </div>
+            <div class="gallery-item" onclick="openModal('images/2.jpg', 'Image 2')">
+                <img src="images/2.jpg" alt="Image 2">
+            </div>
+            <div class="gallery-item" onclick="openModal('images/3.jpg', 'Image 3')">
+                <img src="images/3.jpg" alt="Image 3">
+            </div>
+            <div class="gallery-item" onclick="openModal('images/4.jpg', 'Image 4')">
+                <img src="images/4.jpg" alt="Image 4">
+            </div>
+            <div class="gallery-item" onclick="openModal('images/5.jpg', 'Image 5')">
+                <img src="images/5.jpg" alt="Image 5">
+            </div>
+            <div class="gallery-item" onclick="openModal('images/6.jpg', 'Image 6')">
+                <img src="images/6.jpg" alt="Image 6">
+            </div>
+            <div class="gallery-item" onclick="openModal('images/7.jpg', 'Image 7')">
+                <img src="images/7.jpg" alt="Image 7">
+            </div>
+            <div class="gallery-item" onclick="openModal('images/8.jpg', 'Image 8')">
+                <img src="images/8.jpg" alt="Image 8">
+            </div>
+            <div class="gallery-item" onclick="openModal('images/9.jpg', 'Image 9')">
+                <img src="images/9.jpg" alt="Image 9">
+            </div>
+            <div class="gallery-item" onclick="openModal('images/10.jpg', 'Image 10')">
+                <img src="images/10.jpg" alt="Image 10">
+            </div>
+            <div class="gallery-item" onclick="openModal('images/11.jpg', 'Image 11')">
+                <img src="images/11.jpg" alt="Image 11">
+            </div>
+            <div class="gallery-item" onclick="openModal('images/12.jpg', 'Image 12')">
+                <img src="images/12.jpg" alt="Image 12">
+            </div>
+            <div class="gallery-item" onclick="openModal('images/13.jpg', 'Image 13')">
+                <img src="images/13.jpg" alt="Image 13">
+            </div>
+            <div class="gallery-item" onclick="openModal('images/14.jpg', 'Image 14')">
+                <img src="images/14.jpg" alt="Image 14">
+            </div>
+            <div class="gallery-item" onclick="openModal('images/15.jpg', 'Image 15')">
+                <img src="images/15.jpg" alt="Image 15">
+            </div>
+            <div class="gallery-item" onclick="openModal('images/16.jpg', 'Image 16')">
+                <img src="images/16.jpg" alt="Image 16">
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="myModal" class="modal" onclick="closeModal()">
+        <span class="modal-close" onclick="closeModal()">&times;</span>
+        <div class="modal-content">
+            <img id="modalImage" src="" alt="Modal Image">
+            <div class="modal-caption" id="modalCaption"></div>
+        </div>
+    </div>
+
+    <script>
+        // Internal JavaScript
+        function openModal(src, caption) {
+            const modal = document.getElementById('myModal');
+            const modalImage = document.getElementById('modalImage');
+            const modalCaption = document.getElementById('modalCaption');
+            
+            modalImage.src = src;
+            modalCaption.textContent = caption;
+            modal.style.display = 'flex';
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('myModal');
+            modal.style.display = 'none';
+        }
+    </script>
+</body>
+</html>

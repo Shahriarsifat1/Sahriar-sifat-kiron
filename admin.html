@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css?family=Poppins:600&display=swap" rel="stylesheet">
+    
+    
+    
+    
+    <title>Admin Panel</title>
+    <style>
+        body {
+            font-family: 'poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: url(bg.png);
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        
+     .container {
+     background: rgba(255, 255, 255, 0.4); /* Blue color with some transparency */
+     padding: 20px;
+     border-radius: 15px;
+     /*box-shadow: 0 4px 10px rgba(0, 255, 255, 0.5); */
+     width: 300px;
+     text-align: center;
+     border: 0.7px solid black; /* Fixed typo: changed 'boder' to 'border' */
+     }
+        
+        
+        h2 {
+            margin-bottom: 20px;
+            color:#ffffff;
+            font-size: 24px;
+        }
+        #dropZone {
+            border: 2px dashed #007BFF;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            background: #f9f9f9;
+            transition: background 0.3s, border-color 0.3s;
+        }
+        #dropZone.dragover {
+            background: #e0e0e0;
+            border-color: #0056b3;
+        }
+        #dropZone:hover {
+            background: #e9ecef;
+        }
+        input[type="file"] {
+            display: none;
+        }
+        button {
+            width: 100%;
+            padding: 15px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+        button:hover {
+            background-color: #0056b3;
+            transform: scale(1.05);
+        }
+        #uploadMessage {
+            margin-top: 10px;
+            color: #28a745;
+            background: rgba(0, 0, 0, 0.5)
+        }
+        #progress {
+            width: 100%;
+            height: 10px;
+            background: #f3f3f3;
+            border-radius: 5px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+        #progress div {
+            height: 100%;
+            background: #007BFF;
+            width: 0;
+            transition: width 0.3s;
+        }
+        #fileInfo {
+            margin-top: 10px;
+            text-align: left;
+            color:white;
+        }
+        
+      .delete{
+      text-decoration :none;
+      padding:10px;
+      background :teal;
+      border:0.8px solid #ddd;
+      margin:20px;
+      color :white;
+      border-radius :10px;
+      
+      
+      }
+        
+        
+    </style>
+</head>
+<body>
+  
+
+
+
+    <div class="container">
+        <h2>Upload Files</h2>
+        <div id="dropZone">Drag & Drop files here or click to select</div>
+        <input type="file" id="fileInput" />
+        <button id="uploadBtn">Upload</button>
+        <div id="progress"><div></div></div>
+        <div id="fileInfo"></div>
+        <div id="uploadMessage"></div><br>
+        <div><a class="delete" href="deleteFiles.html">Delete Files</a>
+        <a class="delete" href="index.html">Go Home</a></div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-storage.js"></script>
+    <script>
+    // Firebase configuration
+    var firebaseConfig = {
+        apiKey: "AIzaSyDKOz-sBiEJmre0eyIr2qnVGoEcZFyLTaY",
+        authDomain: "photography-4ded6.firebaseapp.com",
+        databaseURL: "https://photography-4ded6-default-rtdb.firebaseio.com",
+        projectId: "photography-4ded6",
+        storageBucket: "photography-4ded6.appspot.com",
+        messagingSenderId: "18693535056",
+        appId: "1:18693535056:web:66ac3aea0cae7826a5a855",
+        measurementId: "G-GTNV78717R"
+    };
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+
+    const dropZone = document.getElementById("dropZone");
+    const fileInput = document.getElementById("fileInput");
+    const uploadBtn = document.getElementById("uploadBtn");
+    const uploadMessage = document.getElementById("uploadMessage");
+    const progressBar = document.getElementById("progress").querySelector('div');
+    const fileInfo = document.getElementById("fileInfo");
+
+    dropZone.addEventListener('click', () => fileInput.click());
+
+    dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.classList.add('dragover');
+    });
+
+    dropZone.addEventListener('dragleave', () => {
+        dropZone.classList.remove('dragover');
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('dragover');
+        fileInput.files = e.dataTransfer.files;
+        displayFileInfo(fileInput.files[0]);
+    });
+
+    fileInput.addEventListener('change', () => {
+        displayFileInfo(fileInput.files[0]);
+    });
+
+    function displayFileInfo(file) {
+        if (file) {
+            fileInfo.innerHTML = `
+                <strong>File Name:</strong> ${file.name}<br>
+                <strong>File Size:</strong> ${(file.size / 1024).toFixed(2)} KB
+            `;
+        }
+    }
+
+    uploadBtn.addEventListener("click", () => {
+        const file = fileInput.files[0];
+        if (file) {
+            // Check file type
+            const validTypes = ['image/jpeg', 'image/png', 'application/zip'];
+            if (!validTypes.includes(file.type)) {
+                uploadMessage.textContent = "Invalid file type. Please upload a JPEG, PNG, or ZIP file.";
+                uploadMessage.style.color = 'red';
+                return;
+            }
+
+            const storageRef = firebase.storage().ref('uploads/' + file.name);
+            const uploadTask = storageRef.put(file);
+
+            uploadTask.on('state_changed', (snapshot) => {
+                const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                progressBar.style.width = progress + '%';
+            }, (error) => {
+                uploadMessage.textContent = 'Upload failed: ' + error.message;
+                uploadMessage.style.color = 'red';
+            }, () => {
+                uploadTask.snapshot.ref.getDownloadURL().then((url) => {
+                    firebase.database().ref('files').push({
+                        name: file.name,
+                        url: url,
+                        size: file.size}).then(() => {
+                        uploadMessage.textContent = 'File uploaded successfully!';
+                        uploadMessage.style.color = '#28a745';
+                        fileInfo.innerHTML = ''; // Clear file info after successful upload
+                        });
+                        });
+                        });
+                        } else {
+                        uploadMessage.textContent = "Please select a file first.";
+                        uploadMessage.style.color = 'red';
+                        }
+                        });
+                        </script>
+                        </body>
+                        </html>

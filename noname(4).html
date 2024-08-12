@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Photo Gallery</title>
+    <style>
+        /* Internal CSS */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1b1f24;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 90%;
+            margin: auto;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .gallery {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+        }
+        .gallery-item {
+            position: relative;
+            overflow: hidden;
+            border-radius: 5px;
+            transition: transform 0.3s ease-in-out;
+            width: calc(25% - 15px); /* Adjust width for responsive layout */
+            height: 200px; /* Fixed height for images */
+            cursor: pointer;
+        }
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Ensure images fit within the box */
+            transition: transform 0.3s ease-in-out, filter 0.3s ease;
+        }
+        .gallery-item:hover img {
+            transform: scale(1.05);
+            filter: grayscale(100%);
+        }
+        .gallery-item::after {
+            content: "View Details";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            border-radius: 5px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .gallery-item:hover::after {
+            opacity: 1;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            animation: fadeIn 0.5s;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .modal img {
+            max-width: 90%;
+            max-height: 80%;
+            margin: auto;
+            border-radius: 10px;
+            transition: transform 0.3s ease-in-out;
+        }
+        .modal-close {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            font-size: 30px;
+            color: white;
+            cursor: pointer;
+        }
+        .modal-caption {
+            position: absolute;
+            bottom: 10px;
+            left: 0;
+            right: 0;
+            color: white;
+            text-align: center;
+            font-size: 16px;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+        }
+        .modal-buttons {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            display: flex;
+            gap: 10px;
+        }
+        .modal-button {
+            background-color: rgba(0, 0, 0, 0.6);
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 14px;
+            text-decoration: none;
+        }
+        .modal-button:hover {
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+        .carousel {
+            position: relative;
+            margin: 20px auto;
+            max-width: 80%;
+            overflow: hidden;
+            border-radius: 10px;
+        }
+        .carousel img {
+            width: 100%;
+            height: auto;
+            transition: transform 1s ease;
+        }
+        .carousel-control {
+            position: absolute;
+            top: 50%;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            transform: translateY(-50%);
+        }
+        .carousel-button {
+            background-color: rgba(0, 0, 0, 0.6);
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 50%;
+            font-size: 20px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .carousel-button:hover {
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+        @media (max-width: 768px) {
+            .gallery-item {
+                width: calc(50% - 15px); /* Adjust width for smaller screens */
+            }
+        }
+        @media (max-width: 576px) {
+            .gallery-item {
+                width: 100%; /* Full width for mobile screens */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Photo Gallery</h1>
+
+        <!-- Gallery Section -->
+        <div class="gallery">
+            <div class="gallery-item">
+                <img src="images/1.jpg" alt="Image 1" onclick="openModal('images/1.jpg', 'Image 1')">
+            </div>
+            <div class="gallery-item">
+                <img src="images/2.jpg" alt="Image 2" onclick="openModal('images/2.jpg', 'Image 2')">
+            </div>
+            <!-- Add more gallery items here -->
+        </div>
+
+        <!-- Carousel -->
+        <div class="carousel">
+            <img id="carouselImage" src="images/1.jpg" alt="Carousel Image">
+            <div class="carousel-control">
+                <button class="carousel-button" onclick="prevImage()">&#10094;</button>
+                <button class="carousel-button" onclick="nextImage()">&#10095;</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="myModal" class="modal" onclick="closeModal()">
+        <span class="modal-close" onclick="closeModal()">&times;</span>
+        <div class="modal-buttons">
+            <a href="#" class="modal-button" id="downloadBtn">Download</a>
+            <a href="#" class="modal-button" onclick="toggleFullscreen()">Full Screen</a>
+        </div>
+        <div class="modal-caption" id="modalCaption"></div>
+        <img id="modalImage" src="" alt="Modal Image">
+    </div>
+
+    <script>
+        // Internal JavaScript
+        let images = [
+            'images/1.jpg', 'images/2.jpg', 'images/3.jpg', 'images/4.jpg',
+            'images/5.jpg', 'images/6.jpg', 'images/7.jpg', 'images/8.jpg',
+            'images/9.jpg', 'images/10.jpg', 'images/11.jpg', 'images/12.jpg',
+            'images/13.jpg', 'images/14.jpg', 'images/15.jpg', 'images/16.jpg'
+        ];
+        let currentIndex = 0;
+        let isFullscreen = false;
+
+        function openModal(src, caption) {
+            const modal = document.getElementById('myModal');
+            const modalImage = document.getElementById('modalImage');
+            const modalCaption = document.getElementById('modalCaption');
+            const downloadBtn = document.getElementById('downloadBtn');
+            
+            modalImage.src = src;
+            modalCaption.textContent = caption;
+            downloadBtn.href = src;
+            modal.style.display = 'flex';
+            currentIndex = images.indexOf(src);
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('myModal');
+            modal.style.display = 'none';
+        }
+
+        function prevImage() {
+            currentIndex = (currentIndex - 1 + images.length) % images.length;
+            document.getElementById('carouselImage').src = images[currentIndex];
+        }
+
+        function nextImage() {
+            currentIndex = (currentIndex + 1) % images.length;
+            document.getElementById('carouselImage').src = images[currentIndex];
+        }
+
+        function toggleFullscreen() {
+            const modalImage = document.getElementById('modalImage');
+            if (!isFullscreen) {
+            if (modalImage.requestFullscreen) {
+            modalImage.requestFullscreen();
+            } else if (modalImage.mozRequestFullScreen) { /* Firefox */
+            modalImage.mozRequestFullScreen();
+            } else if (modalImage.webkitRequestFullscreen) { /* Chrome, Safari & Opera */
+            modalImage.webkitRequestFullscreen();
+            } else if (modalImage.msRequestFullscreen) { /* IE/Edge */
+            modalImage.msRequestFullscreen();
+            }
+            isFullscreen = true;
+            } else {
+            if (document.exitFullscreen) {
+            document.exitFullscreen();
+            } else if (document.mozCancelFullScreen) { /* Firefox */
+            document.mozCancelFullScreen();
+            } else if (document.webkitExitFullscreen) { /* Chrome, Safari & Opera */
+            document.webkitExitFullscreen();
+            } else if (document.msExitFullscreen) { /* IE/Edge */
+            document.msExitFullscreen();
+            }
+            isFullscreen = false;
+            }
+            }
+            
+            document.querySelectorAll('.gallery-item img').forEach(img => {
+            img.onload = () => img.classList.add('loaded');
+            });
+            
+            // Auto play carousel
+            setInterval(nextImage, 5000); // Change image every 5 seconds
+            </script>
+            </body>
+            </html>

@@ -1,0 +1,141 @@
+.container{
+            background-color:#fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width:10%;
+            max-width:300px;
+            position: relative;
+        }
+
+       .h22 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        #searchBar {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+
+        button {
+            width: 100%;
+            padding: 20px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #fileList {
+            max-height: 400px;
+            overflow-y: auto;
+            padding-left: 0;
+            margin-top: 10px;
+            
+        }
+
+        #fileList li {
+            list-style: none;
+            padding: 10px;
+            border: 1px solid #ddd;
+            margin-top: 10px;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            display: flex;
+            align-items: center;
+            box-sizing: border-box;
+            transition: background-color 0.3s ease;
+            position: relative;
+        }
+
+        #fileList li:hover {
+            background-color: #f1f1f1;
+        }
+
+        #fileList li .file-icon {
+            width: 30px;
+            height: 30px;
+            margin-right: 10px;
+            color: #333;
+            font-size :1.4rem;
+        }
+
+        #fileList li .file-name {
+            flex-grow: 1;
+            color: #000;
+            margin-right: 10px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: calc(100% - 150px); /* Adjust based on space needed for size and button */
+        }
+
+        #fileList li .file-size {
+            margin-right: 10px;
+            font-size: 12px;
+            color: #555;
+            white-space: nowrap;
+        }
+
+        #fileList li .download-btn {
+            width: 100px;
+            height: 30px;
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s ease;
+            margin-left: auto; /* Align button to the right */
+            position: absolute;
+            right: 10px; /* Adjust this value to position the button as needed */
+        }
+
+        #fileList li .download-btn:hover {
+            background-color: #218838;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+                width: 100%;
+            }
+
+            #searchBar {
+                width: calc(100% - 18px);
+            }
+
+            #fileList li .file-name {
+                max-width: calc(100% - 120px);
+            }
+
+            #fileList li .download-btn {
+                width: 80px;
+                height: 25px;
+            }
+        }
+
+        /* Loading Spinner */
+        #loadingSpinner {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
